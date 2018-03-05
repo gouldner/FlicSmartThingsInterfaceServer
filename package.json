@@ -1,0 +1,11 @@
+{
+  "name": "flic_smart_things_interface_server",
+  "version": "1.0.0",
+  "description": "Forward simple http request to secure SmartThings api requests.",
+  "main": "main.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Ronald Gouldner",
+  "license": "ISC"
+}
