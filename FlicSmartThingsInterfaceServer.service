@@ -1,0 +1,9 @@
+[Unit]
+Description=Flic Smart Things Server Service
+After=network-online.target
+
+[Service]
+Type=simple
+ExecStart=/home/pi/FlicSmartThingsInterfaceServer/startFlicSmartInterface.sh
+WorkingDirectory=/home/pi/FlicSmartThingsInterfaceServer
+User=pi
