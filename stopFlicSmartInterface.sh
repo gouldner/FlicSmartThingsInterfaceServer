@@ -1,3 +1,4 @@
+#!/bin/bash
 BASEDIR=`dirname $0`
 PIDFILE=${BASEDIR}/running.pid
 
