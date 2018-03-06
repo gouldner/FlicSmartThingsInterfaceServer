@@ -18,8 +18,16 @@ $cp FST.config.sample FST.config
    or this thread:https://community.smartthings.com/t/example-using-new-smartthings-cloud-api/104304
 
 4) Install as a service and start
-sudo ln -s /home/pi/FlicSmartThingsInterfaceServer/FlicSmartThingsInterfaceServer.service /etc/systemd/system/FlicSmartThingsInterfaceServer.service
-sudo systemctl start FlicSmartThingsInterfaceServer.service
+sudo cp /home/pi/FlicSmartThingsInterfaceServer/FST.service /etc/systemd/system/FST.service
+sudo systemctl enable FST.service
+sudo systemctl start FST.service
+
+5) If you want to configure avahi to {hostname}.local address
+sudo apt-get install avahi-daemon
+sudo insserv avahi-daemon
+cp ./avahi.multiple.service /etc/avahi/services/multiple.service
+sudo /etc/init.d/avahi-daemon restart
+NOTE: if you change port from 9090 you need to edit multiple.service with correct port
 
 Visit http://{server_ip}:{configured_port}/help for how to use the interface
 

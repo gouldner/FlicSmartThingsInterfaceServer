@@ -1,0 +1,15 @@
+[Unit]
+Description=flicSmartThingsService
+Wants=network-online.target
+After=network.target network-online.target
+
+[Service]
+Type=simple
+ExecStart=/home/pi/FlicSmartThingsInterfaceServer/startFlicSmartInterface.sh
+WorkingDirectory=/home/pi/FlicSmartThingsInterfaceServer
+User=pi
+Restart=always
+RestartSec=30s
+
+[Install]
+WantedBy=multi-user.target
