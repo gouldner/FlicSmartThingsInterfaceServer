@@ -9,7 +9,8 @@ $nvm install v6.13.0
 $cd /home/pi
 $git clone https://github.com/gouldner/FlicSmartThingsInterfaceServer.git
 
-3) build to get reqired node_modules
+3) build to get required node_modules
+nvm use v6.13.0
 npm install
 
 4) setup config
@@ -39,5 +40,8 @@ NOTES:
 --Your server should run on a machine with a fixed IP or dns lookup
 --You will want to install as a service or add to startup on machine to assure server is always running
 --If you are not using raspberry pi, your user isn't pi, your home directory isn't /home/pi etc things will not work without your editing the service and start scripts
+-- NVM is really slow on pi zero making login really slow, so to fix you can alter the required .bashrc
+   includes for nvm with the --no-use option 
+   this will case nvm to not load node on every login which is fine since I load it in the startup script
 
 
