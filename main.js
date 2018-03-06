@@ -138,17 +138,18 @@ function toggle(deviceId) {
 }
 
 function showDevices(response) {
-    response.writeHead(200, {"Content-Type": "text/html"});
-    response.write("<html>")
-    response.write("<table>")
+    response.writeHead(200, {'Content-Type': 'text/html'});
+    response.write('<html>')
+    response.write('<h1>Switches</h1>')
+    response.write('<table>')
     for (var i = 0; i < switches.length; i++) {
-        response.write("<tr>")
-        response.write("<td>" + switches[i].label + '</td>')
-        response.write("<td>" + switches[i].deviceId + '</td>')
-        response.write("</tr>")
+        response.write('<tr>')
+        response.write('<td><a href="/toggle?deviceName=' + switches[i].label + '">toggle</a> ' + switches[i].label + '</td>')
+        //response.write('<td>' + switches[i].deviceId + '</td>')
+        response.write('</tr>')
     }
-    response.write("</table>")
-    response.write("</html>")
+    response.write('</table>')
+    response.write('</html>')
     response.end();
 }
 
