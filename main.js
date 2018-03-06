@@ -1,6 +1,6 @@
 const url = require('url')
 const http = require('http')
-var devices
+var switches
 const token = process.env.SMARTTHINGS_API_TOKEN
 const serverPort = process.env.SERVER_PORT || 9090
 const app = http.createServer((request, response) => {
@@ -20,10 +20,10 @@ const app = http.createServer((request, response) => {
         var queryData = url.parse(request.url, true).query;
         var deviceName = queryData.deviceName
         var targetId = ""
-        if (devices != undefined) {
-            for (var i = 0; i < devices.items.length; i++) {
-                if (devices.items[i].label == deviceName) {
-                    targetId = devices.items[i].deviceId
+        if (switches != undefined) {
+            for (var i = 0; i < switches.length; i++) {
+                if (switches[i].label == deviceName) {
+                    targetId = switches[i].deviceId
                     break
                 }
             }
@@ -141,10 +141,10 @@ function showDevices(response) {
     response.writeHead(200, {"Content-Type": "text/html"});
     response.write("<html>")
     response.write("<table>")
-    for (var i = 0; i < devices.items.length; i++) {
+    for (var i = 0; i < switches.length; i++) {
         response.write("<tr>")
-        response.write("<td>" + devices.items[i].label + '</td>')
-        response.write("<td>" + devices.items[i].deviceId + '</td>')
+        response.write("<td>" + switches[i].label + '</td>')
+        response.write("<td>" + switches[i].deviceId + '</td>')
         response.write("</tr>")
     }
     response.write("</table>")
@@ -177,16 +177,27 @@ function loadDevices(response) {
         res.on('data', function(chunk) {
             data += chunk;
         }).on('end', function() {
-            devices = JSON.parse(data)
+            var devices = JSON.parse(data)
+            function compareElements(a, b) {
+                var alabel=a.label.toLowerCase()
+                var blabel=b.label.toLowerCase()
+                if (alabel < blabel)
+                    return -1;
+                if (alabel > blabel)
+                    return 1;
+                return 0;
+            }
+            var items = devices.items
+            switches = items.sort(compareElements);
             if (response != undefined) {
 
                 response.writeHead(200, {"Content-Type": "text/html"});
                 response.write("<html>")
                 response.write("<table>")
-                for (var i = 0; i < devices.items.length; i++) {
+                for (var i = 0; i < switches.length; i++) {
                     response.write("<tr>")
-                    response.write("<td>" + devices.items[i].label + '</td>')
-                    response.write("<td>" + devices.items[i].deviceId + '</td>')
+                    response.write("<td>" + switches[i].label + '</td>')
+                    response.write("<td>" + switches[i].deviceId + '</td>')
                     response.write("</tr>")
                 }
                 response.write("</table>")
