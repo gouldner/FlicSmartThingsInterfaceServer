@@ -18,7 +18,7 @@ $cp FST.config.sample FST.config
    or this thread:https://community.smartthings.com/t/example-using-new-smartthings-cloud-api/104304
 
 4) Install as a service and start
-sudo ln -s /home/pi/FlicSmartThingsInterfaceServer/FlicSmartThingsInterfaceServer.service ./FlicSmartThingsInterfaceServer.service
+sudo ln -s /home/pi/FlicSmartThingsInterfaceServer/FlicSmartThingsInterfaceServer.service /etc/systemd/system/FlicSmartThingsInterfaceServer.service
 sudo systemctl start FlicSmartThingsInterfaceServer.service
 
 Visit http://{server_ip}:{configured_port}/help for how to use the interface
