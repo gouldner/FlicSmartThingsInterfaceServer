@@ -1,65 +1,14 @@
 const url = require('url')
 const http = require('http')
+const fs = require('fs')
+const express = require('express')
+const app = express()
+
 var switches
 const token = process.env.SMARTTHINGS_API_TOKEN
 const serverPort = process.env.SERVER_PORT || 9090
-const app = http.createServer((request, response) => {
-    var urlPath = url.parse(request.url).pathname
-    if (request.url == "/showDevices") {
-        showDevices(response)
-    } else if(request.url === "/reloadDevices") {
-        loadDevices(response)
-    } else if(request.url === "/help" || request.url === "/") {
-        response.write('<html><h1>Help Details</h1>')
-        response.write('<bl>')
-        response.write('<li>/reloadDevices will send new request to SmartThings for all switches</li>');
-        response.write('<li>/showDevices will display currently loaded devices</li>');
-        response.write('<li>/toggle?deviceName={device name}} will toggle the on/off state of the device</li>')
-        response.end();
-    } else if(urlPath === "/toggle") {
-        var queryData = url.parse(request.url, true).query;
-        var deviceName = queryData.deviceName
-        var targetId = ""
-        if (switches != undefined) {
-            for (var i = 0; i < switches.length; i++) {
-                if (switches[i].label == deviceName) {
-                    targetId = switches[i].deviceId
-                    break
-                }
-            }
-            if (targetId != "") {
-                toggle(targetId)
-                response.writeHead(200, {"Content-Type": "text/html"});
-                response.write('<h1>Success found switch and requested toggle</h1>')
-                response.write('<br>request=' + request.url + '');
-                response.write('<br>deviceName=' + deviceName + '');
-                response.write('<br>targetId=' + targetId + '');
-                response.end();
-            } else {
-                response.writeHead(200, {"Content-Type": "text/html"});
-                response.write('<br>request=' + request.url + '');
-                response.write('<br>deviceName=' + deviceName + '');
-                response.write('<br>targetId=' + 'Not Found');
-                response.end();
-            }
-        } else {
-            response.writeHead(200, {"Content-Type": "text/html"});
-            response.write(`<br>request=` + request.url + '');
-            response.write(`<br>deviceName=` + deviceName + '');
-            response.write(`<br>targetId=` + 'No Devices Loaded Check Server');
-            response.end();
-        }
-    } else {
-        response.writeHead(200, {"Content-Type": "text/html"});
-        response.write('<h1>Unknown Request.</h1><br>');
-        response.write('request=' + request.url + '');
-        response.end();
-    }
-});
 
-
-function postSmartThingsRequest(deviceId,currentStatus) {
-    var commandString = (currentStatus == 'on') ? 'off' : 'on';
+function postSmartThingsRequest(deviceId,commandString) {
     var http = require('https');
 
     var post_req  = null,
@@ -125,7 +74,7 @@ function toggle(deviceId) {
             console.log('Response: ', chunk);
             var reply = JSON.parse(chunk)
             var currentStatus = reply.switch.value;
-            postSmartThingsRequest(deviceId,currentStatus)
+            postSmartThingsRequest(deviceId,(currentStatus == 'on') ? 'off' : 'on')
         });
     });
 
@@ -137,23 +86,71 @@ function toggle(deviceId) {
     get_req.end();
 }
 
-function showDevices(response) {
-    response.writeHead(200, {'Content-Type': 'text/html'});
-    response.write('<html>')
-    response.write('<h1>Switches</h1>')
-    response.write('<table>')
-    for (var i = 0; i < switches.length; i++) {
-        response.write('<tr>')
-        response.write('<td><a href="/toggle?deviceName=' + switches[i].label + '">toggle</a> ' + switches[i].label + '</td>')
-        //response.write('<td>' + switches[i].deviceId + '</td>')
-        response.write('</tr>')
+function switchOn(request,response) {
+    switchOnOff(request,response,"on")
+}
+
+function switchOff(request,response) {
+    switchOnOff(request,response,"off")
+}
+
+function switchOnOff(request,response,commandString) {
+    var queryData = url.parse(request.url, true).query
+    var devicename = queryData.deviceName
+    var targetid = ""
+    if (switches != undefined) {
+        for (var i = 0; i < switches.length; i++) {
+            if (switches[i].label == devicename) {
+                targetid = switches[i].deviceId
+                break
+            }
+        }
+        if (targetid != "") {
+            postSmartThingsRequest(targetid,commandString)
+            response.writeHead(200, {"content-type": "text/html"});
+            response.write('<h1>success found switch and requested switch "' + commandString + '"</h1>')
+            response.write('<br>request=' + request.url + '');
+            response.write('<br>devicename=' + devicename + '');
+            response.write('<br>targetid=' + targetid + '');
+            response.end();
+        } else {
+            response.writeHead(200, {"content-type": "text/html"});
+            response.write('<br>request=' + request.url + '');
+            response.write('<br>devicename=' + devicename + '');
+            response.write('<br>targetid=' + 'not found');
+            response.end();
+        }
+    } else {
+        response.writeHead(200, {"content-type": "text/html"});
+        response.write(`<br>request=` + request.url + '');
+        response.write(`<br>devicename=` + devicename + '');
+        response.write(`<br>targetid=` + 'no devices loaded check server');
+        response.end();
     }
-    response.write('</table>')
-    response.write('</html>')
+}
+
+function showDevices(request,response) {
+    response.writeHead(200, {'Content-Type': 'text/html'});
+    response.write('<html>\n')
+    response.write('<head>\n')
+    response.write('</head>\n')
+    response.write('<body>\n')
+    response.write('<h1>Switches</h1>\n')
+    response.write('<table>\n')
+    if (switches != undefined) {
+        for (var i = 0; i < switches.length; i++) {
+            response.write('<tr>\n')
+            response.write('<td><a id="' + switches[i].label + '-link" href="/toggle?deviceName=' + switches[i].label + '">toggle</a> ' + switches[i].label + '</td>\n')
+            response.write('</tr>\n')
+        }
+    }
+    response.write('</table>\n')
+    response.write('</body>\n')
+    response.write('</html>\n')
     response.end();
 }
 
-function loadDevices(response) {
+function loadDevices(request,response) {
     var http = require('https');
     var get_options = {
         hostname: 'api.smartthings.com',
@@ -191,20 +188,7 @@ function loadDevices(response) {
             var items = devices.items
             switches = items.sort(compareElements);
             if (response != undefined) {
-
-                response.writeHead(200, {"Content-Type": "text/html"});
-                response.write("<html>")
-                response.write("<table>")
-                for (var i = 0; i < switches.length; i++) {
-                    response.write("<tr>")
-                    response.write("<td>" + switches[i].label + '</td>')
-                    response.write("<td>" + switches[i].deviceId + '</td>')
-                    response.write("</tr>")
-                }
-                response.write("</table>")
-                response.write("</html>")
-                response.write(data)
-                response.end();
+                showDevices(request,response)
             } else {
                 console.log(devices);
             }
@@ -220,5 +204,55 @@ function loadDevices(response) {
     get_req.end();
 }
 
-app.listen(serverPort);
-loadDevices();
+function toggleSwitch(request,response) {
+    var queryData = url.parse(request.url, true).query
+    var devicename = queryData.deviceName
+    var targetid = ""
+    if (switches != undefined) {
+        for (var i = 0; i < switches.length; i++) {
+            if (switches[i].label == devicename) {
+                targetid = switches[i].deviceId
+                break
+            }
+        }
+        if (targetid != "") {
+            toggle(targetid)
+            response.writeHead(200, {"content-type": "text/html"});
+            response.write('<h1>success found switch and requested toggle</h1>')
+            response.write('<br>request=' + request.url + '');
+            response.write('<br>devicename=' + devicename + '');
+            response.write('<br>targetid=' + targetid + '');
+            response.end();
+        } else {
+            response.writeHead(200, {"content-type": "text/html"});
+            response.write('<br>request=' + request.url + '');
+            response.write('<br>devicename=' + devicename + '');
+            response.write('<br>targetid=' + 'not found');
+            response.end();
+        }
+    } else {
+        response.writeHead(200, {"content-type": "text/html"});
+        response.write(`<br>request=` + request.url + '');
+        response.write(`<br>devicename=` + devicename + '');
+        response.write(`<br>targetid=` + 'no devices loaded check server');
+        response.end();
+    }
+}
+
+function help(request,response) {
+    response.write('<html><h1>Help Details</h1>')
+    response.write('<bl>')
+    response.write('<li><a href="/reloadDevices">/reloadDevices</a> will send new request to SmartThings for all switches</li>');
+    response.write('<li><a href="/showDevices">/showDevices</a> will display currently loaded devices</li>');
+    response.write('<li>/toggle?deviceName={device name}} will toggle the on/off state of the device</li>')
+    response.end();
+}
+
+app.get('/showDevices',showDevices)
+app.get('/reloadDevices',loadDevices)
+app.get('/toggle',toggleSwitch)
+app.get('/switchOn',switchOn)
+app.get('/switchOff',switchOff)
+app.get('/help',help)
+app.get('/',help)
+app.listen(serverPort,loadDevices())

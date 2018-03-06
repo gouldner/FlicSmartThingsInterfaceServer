@@ -9,7 +9,10 @@ $nvm install v6.13.0
 $cd /home/pi
 $git clone https://github.com/gouldner/FlicSmartThingsInterfaceServer.git
 
-3) setup config
+3) build to get reqired node_modules
+npm install
+
+4) setup config
 $cp FST.config.sample FST.config
 -modify port you want server to use
 -enter SmartThings API token 
@@ -17,12 +20,12 @@ $cp FST.config.sample FST.config
    Read more on API here:https://smartthings.developer.samsung.com/develop/api-ref/st-api.html
    or this thread:https://community.smartthings.com/t/example-using-new-smartthings-cloud-api/104304
 
-4) Install as a service and start
+5) Install as a service and start
 sudo cp /home/pi/FlicSmartThingsInterfaceServer/FST.service /etc/systemd/system/FST.service
 sudo systemctl enable FST.service
 sudo systemctl start FST.service
 
-5) If you want to configure avahi to {hostname}.local address
+6) If you want to configure avahi to {hostname}.local address
 sudo apt-get install avahi-daemon
 sudo insserv avahi-daemon
 cp ./avahi.multiple.service /etc/avahi/services/multiple.service

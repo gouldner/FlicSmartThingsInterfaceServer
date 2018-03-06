@@ -2,3 +2,4 @@ FST.config
 FST.log
 running.pid
 .idea
+node_modules
