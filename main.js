@@ -140,7 +140,13 @@ function showDevices(request,response) {
     if (switches != undefined) {
         for (var i = 0; i < switches.length; i++) {
             response.write('<tr>\n')
-            response.write('<td><a id="' + switches[i].label + '-link" href="/toggle?deviceName=' + switches[i].label + '">toggle</a> ' + switches[i].label + '</td>\n')
+            response.write('<td>' + switches[i].label + '</td>\n')
+            response.write('<td>&nbsp &nbsp &nbsp</td>')
+            response.write('<td><a href="/toggle?deviceName=' + switches[i].label + '">toggle</a></td>\n')
+            response.write('<td>&nbsp &nbsp &nbsp</td>')
+            response.write('<td><a href="/switchOn?deviceName=' + switches[i].label + '">switchOn</a></td>\n')
+            response.write('<td>&nbsp &nbsp &nbsp</td>')
+            response.write('<td><a href="/switchOff?deviceName=' + switches[i].label + '">switchOff</a></td>\n')
             response.write('</tr>\n')
         }
     }
