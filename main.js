@@ -133,20 +133,36 @@ function showDevices(request,response) {
     response.writeHead(200, {'Content-Type': 'text/html'});
     response.write('<html>\n')
     response.write('<head>\n')
+    response.write('<style>\n')
+    response.write('a.button {\n' +
+        '    background-color: #4CAF50; /* Green */\n' +
+        '    border: none;\n' +
+        '    color: white;\n' +
+        '    padding: 15px 32px;\n' +
+        '    text-align: center;\n' +
+        '    text-decoration: none;\n' +
+        '    display: inline-block;\n' +
+        '    font-size: 16px;' +
+        '}\n' +
+        'tr.spacedRow>td {\n' +
+        '  padding-bottom: 1em;\n' +
+        '  padding-top: 1em;\n' +
+        '}')
+    response.write('</style>\n')
     response.write('</head>\n')
     response.write('<body>\n')
     response.write('<h1>Switches</h1>\n')
     response.write('<table>\n')
     if (switches != undefined) {
         for (var i = 0; i < switches.length; i++) {
-            response.write('<tr>\n')
-            response.write('<td>' + switches[i].label + '</td>\n')
+            response.write('<tr class="spacedRow">\n')
+            response.write('<td><h3 style="text-align: right;">' + switches[i].label + '</h3></td>\n')
             response.write('<td>&nbsp &nbsp &nbsp</td>')
-            response.write('<td><a href="/toggle?deviceName=' + switches[i].label + '">toggle</a></td>\n')
+            response.write('<td><a class=button href="/toggle?deviceName=' + switches[i].label + '">toggle</a></td>\n')
             response.write('<td>&nbsp &nbsp &nbsp</td>')
-            response.write('<td><a href="/switchOn?deviceName=' + switches[i].label + '">switchOn</a></td>\n')
+            response.write('<td><a class=button href="/switchOn?deviceName=' + switches[i].label + '">switchOn</a></td>\n')
             response.write('<td>&nbsp &nbsp &nbsp</td>')
-            response.write('<td><a href="/switchOff?deviceName=' + switches[i].label + '">switchOff</a></td>\n')
+            response.write('<td><a class=button href="/switchOff?deviceName=' + switches[i].label + '">switchOff</a></td>\n')
             response.write('</tr>\n')
         }
     }
