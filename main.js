@@ -97,12 +97,18 @@ function switchOff(request,response) {
 function switchOnOff(request,response,commandString) {
     var queryData = url.parse(request.url, true).query
     var devicename = queryData.deviceName
+    var deviceId = queryData.deviceId
     var targetid = ""
     if (switches != undefined) {
-        for (var i = 0; i < switches.length; i++) {
-            if (switches[i].label == devicename) {
-                targetid = switches[i].deviceId
-                break
+        if (deviceId != undefined) {
+            targetid=deviceId;
+        }
+        if (devicename != undefined) {
+            for (var i = 0; i < switches.length; i++) {
+                if (switches[i].label == devicename) {
+                    targetid = switches[i].deviceId
+                    break
+                }
             }
         }
         if (targetid != "") {
@@ -117,6 +123,7 @@ function switchOnOff(request,response,commandString) {
             response.writeHead(200, {"content-type": "text/html"});
             response.write('<br>request=' + request.url + '');
             response.write('<br>devicename=' + devicename + '');
+            response.write('<br>deviceId=' + deviceId + '');
             response.write('<br>targetid=' + 'not found');
             response.end();
         }
@@ -124,6 +131,7 @@ function switchOnOff(request,response,commandString) {
         response.writeHead(200, {"content-type": "text/html"});
         response.write(`<br>request=` + request.url + '');
         response.write(`<br>devicename=` + devicename + '');
+        response.write('<br>deviceId=' + deviceId + '');
         response.write(`<br>targetid=` + 'no devices loaded check server');
         response.end();
     }
@@ -133,8 +141,37 @@ function showDevices(request,response) {
     response.writeHead(200, {'Content-Type': 'text/html'});
     response.write('<html>\n')
     response.write('<head>\n')
-    response.write('<style>\n')
-    response.write('a.button {\n' +
+    response.write(addCss())
+    response.write('</head>\n')
+    response.write('<body>\n')
+    response.write('<h1>Switches (with Name based links)</h1>\n')
+    response.write('<h3>NOTE:Spaces don\'t work with Flic Internet Request so use <a href="/showDevicesId">ID based links</a>)</h3>\n')
+
+
+    response.write('<table>\n')
+    if (switches != undefined) {
+        for (var i = 0; i < switches.length; i++) {
+            response.write('<tr class="spacedRow">\n')
+            response.write('<td><h3 style="text-align: right;">' + switches[i].label + '</h3></td>\n')
+            response.write('<td>&nbsp &nbsp &nbsp</td>')
+            response.write('<td><a class=button href="/toggle?deviceName=' + switches[i].label + '">toggle</a></td>\n')
+            response.write('<td>&nbsp &nbsp &nbsp</td>')
+            response.write('<td><a class=button href="/switchOn?deviceName=' + switches[i].label + '">switchOn</a></td>\n')
+            response.write('<td>&nbsp &nbsp &nbsp</td>')
+            response.write('<td><a class=button href="/switchOff?deviceName=' + switches[i].label + '">switchOff</a></td>\n')
+            response.write('</tr>\n')
+        }
+    }
+    response.write('</table>\n')
+    response.write('</body>\n')
+    response.write('</html>\n')
+    response.end();
+}
+
+function addCss() {
+    var css = "";
+    css = css.concat('<style>\n')
+    css = css.concat('a.button {\n' +
         '    background-color: #4CAF50; /* Green */\n' +
         '    border: none;\n' +
         '    color: white;\n' +
@@ -148,21 +185,29 @@ function showDevices(request,response) {
         '  padding-bottom: 1em;\n' +
         '  padding-top: 1em;\n' +
         '}')
-    response.write('</style>\n')
+    css = css.concat('</style>\n')
+    return css
+}
+
+function showDevicesId(request,response) {
+    response.writeHead(200, {'Content-Type': 'text/html'});
+    response.write('<html>\n')
+    response.write('<head>\n')
+    response.write(addCss())
     response.write('</head>\n')
     response.write('<body>\n')
-    response.write('<h1>Switches</h1>\n')
+    response.write('<h1>Switches (with ID based links)</h1>\n')
     response.write('<table>\n')
     if (switches != undefined) {
         for (var i = 0; i < switches.length; i++) {
             response.write('<tr class="spacedRow">\n')
             response.write('<td><h3 style="text-align: right;">' + switches[i].label + '</h3></td>\n')
             response.write('<td>&nbsp &nbsp &nbsp</td>')
-            response.write('<td><a class=button href="/toggle?deviceName=' + switches[i].label + '">toggle</a></td>\n')
+            response.write('<td><a class=button href="/toggle?deviceId=' + switches[i].deviceId + '">toggle</a></td>\n')
             response.write('<td>&nbsp &nbsp &nbsp</td>')
-            response.write('<td><a class=button href="/switchOn?deviceName=' + switches[i].label + '">switchOn</a></td>\n')
+            response.write('<td><a class=button href="/switchOn?deviceId=' + switches[i].deviceId + '">switchOn</a></td>\n')
             response.write('<td>&nbsp &nbsp &nbsp</td>')
-            response.write('<td><a class=button href="/switchOff?deviceName=' + switches[i].label + '">switchOff</a></td>\n')
+            response.write('<td><a class=button href="/switchOff?deviceId=' + switches[i].deviceId + '">switchOff</a></td>\n')
             response.write('</tr>\n')
         }
     }
@@ -229,12 +274,19 @@ function loadDevices(request,response) {
 function toggleSwitch(request,response) {
     var queryData = url.parse(request.url, true).query
     var devicename = queryData.deviceName
+    var deviceId = queryData.deviceId
     var targetid = ""
     if (switches != undefined) {
-        for (var i = 0; i < switches.length; i++) {
-            if (switches[i].label == devicename) {
-                targetid = switches[i].deviceId
-                break
+        if (deviceId != undefined) {
+            targetid=deviceId;
+        }
+        if (devicename != undefined) {
+
+            for (var i = 0; i < switches.length; i++) {
+                if (switches[i].label == devicename) {
+                    targetid = switches[i].deviceId
+                    break
+                }
             }
         }
         if (targetid != "") {
@@ -262,14 +314,28 @@ function toggleSwitch(request,response) {
 }
 
 function help(request,response) {
-    response.write('<html><h1>Help Details</h1>')
-    response.write('<bl>')
-    response.write('<li><a href="/reloadDevices">/reloadDevices</a> will send new request to SmartThings for all switches</li>');
-    response.write('<li><a href="/showDevices">/showDevices</a> will display currently loaded devices</li>');
-    response.write('<li>/toggle?deviceName={device name}} will toggle the on/off state of the device</li>')
+    response.write('<html>')
+    response.write('<head>\n')
+    response.write(addCss())
+    response.write('</head>\n')
+    response.write('<body>\n')
+    response.write('<h1>Help Details</h1>')
+    response.write('<table>\n')
+    response.write('<tr class="spacedRow"><tr><td><a class=button href="/reloadDevices">/reloadDevices</a> will send new request to SmartThings for all switches</td></tr></tr>');
+    response.write('<tr class="spacedRow"><td><a class=button href="/showDevices">/showDevices</a> will display currently loaded devices</td></tr>');
+    response.write('<tr class="spacedRow"><td><a class=button href="/showDevicesId">/showDevicesId</a> will display currently loaded devices</td></tr>');
+    response.write('<tr class="spacedRow"><td>/toggle?deviceName={device name}} will toggle the on/off state of the device</td></tr>')
+    response.write('<tr class="spacedRow"><td>/toggle?deviceId={device id}} will toggle the on/off state of the device</td></tr>')
+    response.write('<tr class="spacedRow"><td>/switchOn?deviceName={device name}} will switch device On</td></tr>')
+    response.write('<tr class="spacedRow"><td>/switchOn?deviceId={device id}} will switch device On</td></tr>')
+    response.write('<tr class="spacedRow"><td>/switchOff?deviceName={device name}} will switch device Off</td></tr>')
+    response.write('<tr class="spacedRow"><td>/switchOff?deviceId={device id}} will switch device Off</td></tr>')
+    response.write('</table>')
+    response.write('</body>\n')
     response.end();
 }
 
+app.get('/showDevicesId',showDevicesId)
 app.get('/showDevices',showDevices)
 app.get('/reloadDevices',loadDevices)
 app.get('/toggle',toggleSwitch)
