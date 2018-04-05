@@ -3,6 +3,7 @@ const http = require('http')
 const fs = require('fs')
 const express = require('express')
 const app = express()
+const oneMinute = 60000
 
 var switches
 const token = process.env.SMARTTHINGS_API_TOKEN
@@ -217,8 +218,13 @@ function showDevicesId(request,response) {
     response.end();
 }
 
+
 function loadDevices(request,response) {
-    var http = require('https');
+    getDevicesFromSmartThings(request,response,0);
+}
+
+function getDevicesFromSmartThings(request,response,retryWaitTime) {
+    var https = require('https');
     var get_options = {
         hostname: 'api.smartthings.com',
         port    : '443',
@@ -228,7 +234,7 @@ function loadDevices(request,response) {
             "Authorization": "Bearer: " + token
         }
     };
-    var get_req = http.request(get_options, function (res) {
+    var get_req = https.request(get_options, function (res) {
         console.log('STATUS: ' + res.statusCode);
         console.log('HEADERS: ' + JSON.stringify(res.headers));
         console.log(res.data);
@@ -265,6 +271,12 @@ function loadDevices(request,response) {
 
     get_req.on('error', function(e) {
         console.log('problem with request: ' + e.message);
+        // if retryWait is 0 then don't retry, this is used for user requested load
+        // if retryWait reaches 1hr then stop retrying
+        // otherwise keep retrying on a logorithmic basis 1->2->4->8->16->32->64
+        if (retryWaitTime!=0 && retryWaitTime < oneMinute*60) {
+            setTimeout(getDevicesFromSmartThings, retryWaitTime, request, response, retryWaitTime * 2)
+        }
     });
 
     get_req.write("");
@@ -343,4 +355,4 @@ app.get('/switchOn',switchOn)
 app.get('/switchOff',switchOff)
 app.get('/help',help)
 app.get('/',help)
-app.listen(serverPort,loadDevices())
+app.listen(serverPort,getDevicesFromSmartThings(undefined,undefined,oneMinute))
