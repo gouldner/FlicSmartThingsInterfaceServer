@@ -26,6 +26,7 @@ sudo cp /home/pi/FlicSmartThingsInterfaceServer/FST.service /etc/systemd/system/
 sudo systemctl enable FST.service
 sudo systemctl start FST.service
 
+This next step is optional and your milage may vary.  I had issues getting avahi working on my pi zero and stopped using it.  It worked at first but would stop working.....Also newer versions of raspbien already expose the {hostname}.local address so this may be unnecessary.  I just use a fixed IP now instead.
 6) If you want to configure avahi to {hostname}.local address
 sudo apt-get install avahi-daemon
 sudo insserv avahi-daemon
