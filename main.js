@@ -8,6 +8,7 @@ const oneMinute = 60000
 var switches
 const token = process.env.SMARTTHINGS_API_TOKEN
 const hassPW = process.env.HASS_PW
+const hassHost = process.env.HASS_HOST
 const serverPort = process.env.SERVER_PORT || 9090
 
 function postSmartThingsRequest(deviceId,commandString) {
@@ -367,7 +368,7 @@ curl -X POST -H "x-ha-access: YOUR_PASSWORD" \
             } ;
 
     var post_options = {
-        hostname: '192.168.7.55',
+        hostname: hassHost,
         port    : '8123',
         path    : '/api/' + apiCommand,
         method  : 'POST',
