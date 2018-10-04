@@ -4,7 +4,7 @@
 export NVM_DIR="$HOME/.nvm"
 [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh" --no-use  # This loads nvm
 #Note: This may be slow but it will select correct version of node
-nvm use v6.13.0
+nvm use v8.10.0
 
 BASEDIR=`dirname $0`
 if [ ! -f ${BASEDIR}/FST.config ]

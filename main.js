@@ -7,6 +7,7 @@ const oneMinute = 60000
 
 var switches
 const token = process.env.SMARTTHINGS_API_TOKEN
+const hassPW = process.env.HASS_PW
 const serverPort = process.env.SERVER_PORT || 9090
 
 function postSmartThingsRequest(deviceId,commandString) {
@@ -347,12 +348,63 @@ function help(request,response) {
     response.end();
 }
 
+function hassApi(request,response) {
+    var queryData = url.parse(request.url, true).query
+    var entityId = queryData.entity_id
+    var apiCommand = queryData.api_command
+    
+/*
+curl -X POST -H "x-ha-access: YOUR_PASSWORD" \
+       -H "Content-Type: application/json" \
+       -d '{"entity_id": "switch.christmas_lights"}' \
+       http://localhost:8123/api/services/switch/turn_on
+*/
+    var http = require('http');
+
+    var post_req  = null,
+        post_data = {
+                entity_id: entityId
+            } ;
+
+    var post_options = {
+        hostname: '192.168.7.55',
+        port    : '8123',
+        path    : '/api/' + apiCommand,
+        method  : 'POST',
+        headers : {
+            'Content-Type': 'application/json',
+            'x-ha-access': hassPW
+        }
+    };
+
+    console.log('PostOptions: ', post_options);
+    console.log('PostData: ', post_data);
+
+    post_req = http.request(post_options, function (res) {
+        console.log('STATUS: ' + res.statusCode);
+        console.log('HEADERS: ' + JSON.stringify(res.headers));
+        res.setEncoding('utf8');
+        res.on('data', function (chunk) {
+            console.log('Response: ', chunk);
+        });
+    });
+
+    post_req.on('error', function(e) {
+        console.log('problem with request: ' + e.message);
+    });
+
+    post_req.write(JSON.stringify(post_data));
+    post_req.end();
+}
+
 app.get('/showDevicesId',showDevicesId)
 app.get('/showDevices',showDevices)
 app.get('/reloadDevices',loadDevices)
 app.get('/toggle',toggleSwitch)
 app.get('/switchOn',switchOn)
 app.get('/switchOff',switchOff)
+app.get('/hassApi',hassApi)
 app.get('/help',help)
 app.get('/',help)
 app.listen(serverPort,getDevicesFromSmartThings(undefined,undefined,oneMinute))
+//app.listen(serverPort)

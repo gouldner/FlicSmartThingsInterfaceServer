@@ -1,2 +1,3 @@
 export SMARTTHINGS_API_TOKEN=
+export HASS_PW=
 export SERVER_PORT=9090
