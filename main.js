@@ -396,16 +396,22 @@ curl -X POST -H "x-ha-access: YOUR_PASSWORD" \
 
     post_req.write(JSON.stringify(post_data));
     post_req.end();
+    response.write('<html>')
+    response.write('<body>\n')
+    response.write('OK\n')
+    response.write('</body>\n')
+    response.write('</html>')
+    response.end();
 }
 
-app.get('/showDevicesId',showDevicesId)
-app.get('/showDevices',showDevices)
-app.get('/reloadDevices',loadDevices)
-app.get('/toggle',toggleSwitch)
-app.get('/switchOn',switchOn)
-app.get('/switchOff',switchOff)
+//app.get('/showDevicesId',showDevicesId)
+//app.get('/showDevices',showDevices)
+//app.get('/reloadDevices',loadDevices)
+//app.get('/toggle',toggleSwitch)
+//app.get('/switchOn',switchOn)
+//app.get('/switchOff',switchOff)
 app.get('/hassApi',hassApi)
-app.get('/help',help)
+//app.get('/help',help)
 app.get('/',help)
-app.listen(serverPort,getDevicesFromSmartThings(undefined,undefined,oneMinute))
-//app.listen(serverPort)
+//app.listen(serverPort,getDevicesFromSmartThings(undefined,undefined,oneMinute))
+app.listen(serverPort)
