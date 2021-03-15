@@ -8,6 +8,7 @@ const oneMinute = 60000
 var switches
 const token = process.env.SMARTTHINGS_API_TOKEN
 const hassPW = process.env.HASS_PW
+const hassApiToken = process.env.HASS_FLIC_INTERFACE_TOKEN
 const hassHost = process.env.HASS_HOST
 const serverPort = process.env.SERVER_PORT || 9090
 
@@ -374,7 +375,8 @@ curl -X POST -H "x-ha-access: YOUR_PASSWORD" \
         method  : 'POST',
         headers : {
             'Content-Type': 'application/json',
-            'x-ha-access': hassPW
+            //'x-ha-access': hassPW
+            'Authorization': "Bearer " + hassApiToken
         }
     };
 
