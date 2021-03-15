@@ -1,4 +1,6 @@
 export SMARTTHINGS_API_TOKEN=
 export HASS_PW=
-export HASS_HOST=
+# hass wired IP
+export HASS_HOST=192.168.7.117
+export HASS_FLIC_INTERFACE_TOKEN=
 export SERVER_PORT=9090

@@ -5,9 +5,9 @@ After=network.target network-online.target
 
 [Service]
 Type=simple
-ExecStart=/home/pi/FlicSmartThingsInterfaceServer/startFlicSmartInterface.sh
-WorkingDirectory=/home/pi/FlicSmartThingsInterfaceServer
-User=pi
+ExecStart=/home/gouldner/FlicSmartThingsInterfaceServer/startFlicSmartInterface.sh
+WorkingDirectory=/home/gouldner/FlicSmartThingsInterfaceServer
+User=gouldner
 Restart=always
 RestartSec=30s
 

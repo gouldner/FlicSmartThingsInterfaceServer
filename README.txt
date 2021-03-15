@@ -1,16 +1,16 @@
 Installing FlicSmartThingsInterfaceServer
 
-1) Install Node v6.13.0 (I recommend installing NVM-Node Version Manager)
+1) Install Node (I recommend installing NVM-Node Version Manager)
     https://github.com/creationix/nvm#install-script
 $curl -o- https://raw.githubusercontent.com/creationix/nvm/v0.33.8/install.sh | bash
-$nvm install v6.13.0
+$nvm install v8.10.0
 
 2) Copy source (easiest is clone repo using git)
 $cd /home/pi
 $git clone https://github.com/gouldner/FlicSmartThingsInterfaceServer.git
 
 3) build to get required node_modules
-nvm use v6.13.0
+nvm use v8.10.0
 npm install
 
 4) setup config
